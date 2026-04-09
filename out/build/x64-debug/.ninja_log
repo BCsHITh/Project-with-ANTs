@@ -1,0 +1,15 @@
+# ninja log v6
+71	1363	7973646577001228	CMakeFiles/AppCLI.dir/src/cli/main_cli.cpp.obj	8d5701589dbbd86e
+145	2535	7973646577740319	CMakeFiles/AppGUI.dir/src/gui/main_gui.cpp.obj	7a6c03615e3f49c0
+50	1415	7973662419936087	CMakeFiles/CoreLib.dir/src/main.cpp.obj	acf7cc0a3c35e513
+11	1388	7973646576401096	CMakeFiles/CoreLib.dir/src/core/core.cpp.obj	f7a803e8b40da1da
+79	1361	7973662420226267	CMakeFiles/AppCLI.dir/src/dicom_manager.cpp.obj	dadcaf3684613cc8
+126	1435	7973662420698730	CMakeFiles/AppCLI.dir/src/main.cpp.obj	93c9cdfe3a1f9427
+14	1352	7973662419576001	CMakeFiles/CoreLib.dir/src/dicom_manager.cpp.obj	4f55be6330a73bdd
+11	811	7973664493248918	CMakeFiles/CoreLib.dir/src/dicom_converter.cpp.obj	1139e873f7245b2b
+27	901	7973664493398953	CMakeFiles/AppCLI.dir/src/dicom_converter.cpp.obj	816c76709c8844d5
+813	1401	7973664501272147	CoreLib.lib	a879b6f519ad8399
+11	1050	7973669631558874	CMakeFiles/CoreLib.dir/src/dicom_manager.cpp.obj	4f55be6330a73bdd
+29	1068	7973669631738921	CMakeFiles/AppCLI.dir/src/dicom_manager.cpp.obj	dadcaf3684613cc8
+1051	1165	7973669641961408	CoreLib.lib	a879b6f519ad8399
+1165	1728	7973669643105296	AppCLI.exe	ce18448020081a7f

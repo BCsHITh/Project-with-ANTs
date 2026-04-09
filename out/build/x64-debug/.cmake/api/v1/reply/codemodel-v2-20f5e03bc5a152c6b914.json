@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "MyNeuroTool",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "AppCLI::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-AppCLI-Debug-f959bf15e725fd1e793e.json",
+					"name" : "AppCLI",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "AppGUI::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-AppGUI-Debug-3cd5d98470ca64308c6b.json",
+					"name" : "AppGUI",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "CoreLib::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CoreLib-Debug-91afa213fb389298e284.json",
+					"name" : "CoreLib",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/28797/OneDrive/Code/Project/Project with ANTs/out/build/x64-debug",
+		"source" : "C:/Users/28797/OneDrive/Code/Project/Project with ANTs"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 8
+	}
+}
