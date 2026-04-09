@@ -1,4 +1,4 @@
-#include "dicom_converter.h"
+﻿#include "dicom_converter.h"
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
@@ -57,6 +57,6 @@ bool Converter::convertSeries(
     }
 }
 
-std::string Converter::getLastError() const {  // ʵ��
+std::string Converter::getLastError() const {  // 实现
     return lastError;
 }

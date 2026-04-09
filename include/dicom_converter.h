@@ -4,6 +4,10 @@
 #include <functional>
 #include "dicom_series.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 namespace fs = std::filesystem;
 
 class Converter {
