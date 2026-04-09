@@ -4,6 +4,11 @@
 #include "dicom_manager.h"
 #include "dicom_converter.h"
 
+void setupConsole() {
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+}
+
 namespace fs = std::filesystem;
 
 void printUsage(const char* progName) {
@@ -60,6 +65,8 @@ bool getFolderPath(const std::string& prompt, fs::path& outPath, bool mustExist 
 }
 
 int main(int argc, char* argv[]) {
+	setupConsole();
+
     std::cout << "=== DICOM to NIfTI Converter (CLI) ===" << std::endl;
     std::cout << "Build Version: 0.0.2" << std::endl;
     std::cout << "dcm2niix: " << DCM2NIIX_EXE << std::endl;
@@ -202,14 +209,23 @@ int main(int argc, char* argv[]) {
         std::cout << "\nCreated files:" << std::endl;
         int fileCount = 0;
         for (const auto& entry : fs::directory_iterator(outputFolder)) {
+            std::string filename = entry.path().filename().string();
             std::string ext = entry.path().extension().string();
-            if (ext == ".gz" || ext == ".nii") {
-                std::cout << "  - " << entry.path().filename().string() << std::endl;
+            bool isNifti = (ext == ".gz" && filename.find(".nii.gz") != std::string::npos) ||
+                (ext == ".nii");
+
+            if (isNifti) {
+                std::cout << "  - " << filename << std::endl;
                 fileCount++;
             }
+        
         }
         if (fileCount == 0) {
-            std::cout << "  (no .nii or .nii.gz files found)" << std::endl;
+            // 尝试显示所有文件用于调试
+            std::cout << "  (no .nii file found, show all files to debug): " << std::endl;
+            for (const auto& entry : fs::directory_iterator(outputFolder)) {
+                std::cout << "  - " << entry.path().filename().string() << std::endl;
+            }
         }
     }
 

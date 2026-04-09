@@ -62,6 +62,7 @@ bool Converter::convertSeries(
 
     std::wostringstream wCmd;
     wCmd << L"\"" << wExePath << L"\" "
+        << L"-v 2 "                    // ⭐ 添加：详细输出
         << L"-o \"" << wOutputDir << L"\" "
         << L"-z y "
         << L"-f \"" << wFileName << L"\" "
