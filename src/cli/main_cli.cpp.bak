@@ -1,0 +1,9 @@
+#include <iostream>
+
+int main() {
+    std::cout << "=== MyNeuroTool CLI ===" << std::endl;
+    std::cout << "dcm2niix path: " << DCM2NIIX_EXE << std::endl;
+    std::cout << "ANTs path: " << ANTS_BIN_PATH << std::endl;
+    std::cout << "Ready to process images!" << std::endl;
+    return 0;
+}
