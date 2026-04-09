@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 
 void printUsage(const char* progName) {
     std::cout << "Usage: " << progName << " <Input DICOM Folder> <Output NIfTI Folder>" << std::endl;
-    std::cout << "      Or enter Interaction Mode" << std::endl;
+    std::cout << "      Or running in Interaction Mode" << std::endl;
     std::cout << "Example: " << progName << " D:\\DICOM\\Study1 D:\\NIfTI\\Output" << std::endl;
 }
 
@@ -31,7 +31,7 @@ bool getFolderPath(const std::string& prompt, fs::path& outPath, bool mustExist 
         std::string input = getUserInput(prompt);
 
         if (input.empty()) {
-            std::cout << "  Input Empty, please try again! " << std::endl;
+            std::cout << "  Forbid empty input, please try angin! " << std::endl;
             continue;
         }
 
@@ -43,14 +43,14 @@ bool getFolderPath(const std::string& prompt, fs::path& outPath, bool mustExist 
         fs::path path(input);
 
         if (mustExist && !fs::exists(path)) {
-            std::cout << "  The Path does not exist: " << path << std::endl;
-            std::cout << "  Please try again! " << std::endl;
+            std::cout << "  Path does not exist" << path << std::endl;
+            std::cout << "  Please input again! " << std::endl;
             continue;
         }
 
         if (mustExist && !fs::is_directory(path)) {
-            std::cout << "  The Path is not unavailable" << path << std::endl;
-            std::cout << "  Please try again! " << std::endl;
+            std::cout << "  Invalid folder path" << path << std::endl;
+            std::cout << "  Please input again! " << std::endl;
             continue;
         }
 
@@ -61,7 +61,7 @@ bool getFolderPath(const std::string& prompt, fs::path& outPath, bool mustExist 
 
 int main(int argc, char* argv[]) {
     std::cout << "=== DICOM to NIfTI Converter (CLI) ===" << std::endl;
-    std::cout << "Build Version：0.0.1" << std::endl;
+    std::cout << "Build Version: 0.0.2" << std::endl;
     std::cout << "dcm2niix: " << DCM2NIIX_EXE << std::endl;
     std::cout << "ANTs: " << ANTS_BIN_PATH << std::endl;
     std::cout << std::endl;
@@ -76,45 +76,45 @@ int main(int argc, char* argv[]) {
         outputFolder = argv[2];
 
         if (!fs::exists(inputFolder)) {
-            std::cerr << "Error: Input folder does not exist" << inputFolder << std::endl;
+            std::cerr << "Error: Folder does not exist! " << inputFolder << std::endl;
             return 1;
         }
     }
     else {
         // 进入交互模式
         std::cout << "=== Interaction Mode ===" << std::endl;
-        std::cout << "Tip: You can directly drag the folder into the window and press Enter" << std::endl;
+        std::cout << "Tips: Drag your folder into the window, and press <Enter>" << std::endl;
         std::cout << std::endl;
 
         // 获取输入文件夹
-        if (!getFolderPath("Please enter DICOM Folder Path:  ", inputFolder, true)) {
-            std::cerr << "Error: Unable to obtain input folder path" << std::endl;
+        if (!getFolderPath("Please input DICOM folder path: ", inputFolder, true)) {
+            std::cerr << "Error：Input folder path is unavailable! " << std::endl;
             return 1;
         }
 
         // 获取输出文件夹
         std::cout << std::endl;
-        std::cout << "The output folder will be used to save the converted NIfTI file" << std::endl;
-        if (!getFolderPath("Please enter output Folder Path: ", outputFolder, false)) {
-            std::cerr << "Error: Unable to obtain input folder path" << std::endl;
+        std::cout << "NIfTI files will be save in Output folder" << std::endl;
+        if (!getFolderPath("Please input Output folder path: ", outputFolder, false)) {
+            std::cerr << "Error：Output folder path is unavailable!" << std::endl;
             return 1;
         }
 
         // 如果输出文件夹不存在，询问是否创建
         if (!fs::exists(outputFolder)) {
-            std::cout << "The output folder does not exist, do you want to create it? (y/n): ";
+            std::cout << "Output folder does not exist, create it? (y/n): ";
             std::string confirm;
             std::getline(std::cin, confirm);
 
             if (confirm.empty() || confirm[0] == 'y' || confirm[0] == 'Y') {
                 if (!fs::create_directories(outputFolder)) {
-                    std::cerr << "Error: Unable to create output folder" << std::endl;
+                    std::cerr << "错误：无法创建输出文件夹" << std::endl;
                     return 1;
                 }
-                std::cout << "Folder is created" << outputFolder << std::endl;
+                std::cout << "已创建文件夹：" << outputFolder << std::endl;
             }
             else {
-                std::cout << "Operation canceled" << std::endl;
+                std::cout << "操作已取消" << std::endl;
                 return 0;
             }
         }
@@ -124,13 +124,13 @@ int main(int argc, char* argv[]) {
 
     // 显示配置
     std::cout << "=== Configuration ===" << std::endl;
-    std::cout << "Input folder:  " << inputFolder << std::endl;
-    std::cout << "Output folder:  " << outputFolder << std::endl;
+    std::cout << "Input folder: " << inputFolder << std::endl;
+    std::cout << "Output folder: " << outputFolder << std::endl;
     std::cout << std::endl;
 
     // 确认开始
     if (argc < 3) {
-        std::cout << "Press enter to start the conversion, or q to exit ...";
+        std::cout << "Press <Enter> to start conversion, or enter <q> to exit...";
         std::string confirm;
         std::getline(std::cin, confirm);
         if (confirm == "q" || confirm == "Q") {
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
     }
 
     // 1. 扫描 DICOM 文件
-    std::cout << "[1/2] Scaning DICOM folder ..." << std::endl;
+    std::cout << "[1/2] Scanning DICOM folder..." << std::endl;
     DICOMManager manager;
     if (!manager.scanDirectory(inputFolder)) {
         std::cerr << "Error: " << manager.getLastError() << std::endl;
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
     }
 
     // 2. 转换每个系列
-    std::cout << "\n[2/2] Start Conversion" << std::endl;
+    std::cout << "\n[2/2] Start conversion..." << std::endl;
     Converter converter;
 
     size_t successCount = 0;
@@ -185,21 +185,21 @@ int main(int argc, char* argv[]) {
         );
 
         if (success) {
-            std::cout << "  Conversion successful" << std::endl;
+            std::cout << "  Conversion Successful! " << std::endl;
             successCount++;
         }
         else {
-            std::cerr << "  Failed!" << converter.getLastError() << std::endl;
+            std::cerr << "  Failed to conversion: " << converter.getLastError() << std::endl;
         }
     }
 
     // 3. 总结
-    std::cout << "\n=== Conversion Completed ===" << std::endl;
+    std::cout << "\n=== Conversion complete ===" << std::endl;
     std::cout << "Success: " << successCount << "/" << seriesList.size() << std::endl;
-    std::cout << "Output directory: " << outputFolder << std::endl;
+    std::cout << "Output Folder: " << outputFolder << std::endl;
 
     if (successCount > 0) {
-        std::cout << "\nGenerated files: " << std::endl;
+        std::cout << "\nCreated files:" << std::endl;
         int fileCount = 0;
         for (const auto& entry : fs::directory_iterator(outputFolder)) {
             std::string ext = entry.path().extension().string();
@@ -209,13 +209,13 @@ int main(int argc, char* argv[]) {
             }
         }
         if (fileCount == 0) {
-            std::cout << "  (.nii or .nii.gz file not found)" << std::endl;
+            std::cout << "  (no .nii or .nii.gz files found)" << std::endl;
         }
     }
 
     // 4. 交互模式下等待用户
     if (argc < 3) {
-        std::cout << "\nPress any key to exit ...";
+        std::cout << "\nPress any key to exit...";
         std::cin.get();
     }
 
