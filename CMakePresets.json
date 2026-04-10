@@ -21,6 +21,17 @@
       }
     },
     {
+      "name": "x64-Release",
+      "inherits": "windows-base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "hidden": true,
       "name": "Qt",
       "cacheVariables": {
