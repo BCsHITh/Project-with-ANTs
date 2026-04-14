@@ -51,7 +51,7 @@
 *.lib
 
 # Executables
-*.exe
+#*.exe
 *.out
 *.app
 
@@ -518,5 +518,9 @@ FodyWeavers.xsd
 
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
+
+# 忽略本地构建输出（示例项目使用 out/ 作为构建目录）
+/out/
+/out/**
 
 # End of https://www.toptal.com/developers/gitignore/api/cmake,visualstudio,qt,c++

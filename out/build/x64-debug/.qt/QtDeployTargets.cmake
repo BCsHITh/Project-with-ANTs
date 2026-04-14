@@ -1,8 +1,0 @@
-set(__QT_DEPLOY_TARGET_CoreLib_FILE C:/Users/28797/OneDrive/Code/Project/Project with ANTs/out/build/x64-debug/CoreLib.lib)
-set(__QT_DEPLOY_TARGET_CoreLib_TYPE STATIC_LIBRARY)
-set(__QT_DEPLOY_TARGET_AppCLI_FILE C:/Users/28797/OneDrive/Code/Project/Project with ANTs/out/build/x64-debug/AppCLI.exe)
-set(__QT_DEPLOY_TARGET_AppCLI_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_AppCLI_RUNTIME_DLLS D:/Aplication/Qt/6.10.1/msvc2022_64/bin/Qt6Cored.dll)
-set(__QT_DEPLOY_TARGET_AppGUI_FILE C:/Users/28797/OneDrive/Code/Project/Project with ANTs/out/build/x64-debug/AppGUI.exe)
-set(__QT_DEPLOY_TARGET_AppGUI_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_AppGUI_RUNTIME_DLLS D:/Aplication/Qt/6.10.1/msvc2022_64/bin/Qt6Widgetsd.dll;D:/Aplication/Qt/6.10.1/msvc2022_64/bin/Qt6Guid.dll;D:/Aplication/Qt/6.10.1/msvc2022_64/bin/Qt6Cored.dll)
