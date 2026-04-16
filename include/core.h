@@ -4,6 +4,7 @@
 #include "dicom_manager.h"
 #include "nifti_manager.h"
 #include "dicom_converter.h"
+#include "image_average.h"
 
 namespace fs = std::filesystem;
 
@@ -20,5 +21,7 @@ int runNiftiManager();
 int runRegistration();
 
 int runBatchRegistration();
+
+int runImageAverage();
 
 #endif // !_CORE_H_

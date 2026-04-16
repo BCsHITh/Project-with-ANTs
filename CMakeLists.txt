@@ -45,7 +45,7 @@ endif()
 # 确保 src/core.cpp 文件存在，如果还没有，先创建一个空文件
 add_library(CoreLib STATIC
     src/core/core.cpp
- "include/dicom_series.h" "include/dicom_manager.h" "include/dicom_converter.h" "src/dicom_manager.cpp" "src/dicom_converter.cpp" "src/main.cpp" "include/nifti_manager.h" "include/core.h" "src/core/core.cpp" "src/nifti_manager.cpp")
+ "include/dicom_series.h" "include/dicom_manager.h" "include/dicom_converter.h" "src/dicom_manager.cpp" "src/dicom_converter.cpp" "src/main.cpp" "include/nifti_manager.h" "include/core.h" "src/core/core.cpp" "src/nifti_manager.cpp" "src/image_average.cpp" "include/image_average.h")
 target_include_directories(CoreLib PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(CoreLib PUBLIC Qt6::Core)
 
@@ -58,7 +58,7 @@ endif()
 # ---------------------------------------------------------
 # 5. CLI 可执行文件 (优先实现)
 # ---------------------------------------------------------
-add_executable(AppCLI "src/cli/main_cli.cpp.bak" "include/dicom_series.h" "include/dicom_manager.h" "include/dicom_converter.h" "src/dicom_manager.cpp" "src/dicom_converter.cpp" "src/main.cpp" "include/nifti_manager.h" "include/core.h" "src/core/core.cpp" "src/nifti_manager.cpp")
+add_executable(AppCLI "src/cli/main_cli.cpp.bak" "include/dicom_series.h" "include/dicom_manager.h" "include/dicom_converter.h" "src/dicom_manager.cpp" "src/dicom_converter.cpp" "src/main.cpp" "include/nifti_manager.h" "include/core.h" "src/core/core.cpp" "src/nifti_manager.cpp" "src/image_average.cpp" "include/image_average.h")
 target_link_libraries(AppCLI PRIVATE CoreLib)
 if(WIN32)
     set_property(TARGET AppCLI PROPERTY VS_DEBUGGER_ENVIRONMENT "${DEBUG_ENV}")
@@ -67,7 +67,7 @@ endif()
 # ---------------------------------------------------------
 # 6. Qt GUI 可执行文件
 # ---------------------------------------------------------
-add_executable(AppGUI WIN32 "src/gui/main_gui.cpp.bak" "include/dicom_series.h" "include/dicom_manager.h" "include/dicom_converter.h" "src/dicom_manager.cpp" "src/dicom_converter.cpp" "src/main.cpp" "include/nifti_manager.h" "include/core.h" "src/core/core.cpp" "src/nifti_manager.cpp")
+add_executable(AppGUI WIN32 "src/gui/main_gui.cpp.bak" "include/dicom_series.h" "include/dicom_manager.h" "include/dicom_converter.h" "src/dicom_manager.cpp" "src/dicom_converter.cpp" "src/main.cpp" "include/nifti_manager.h" "include/core.h" "src/core/core.cpp" "src/nifti_manager.cpp" "src/image_average.cpp" "include/image_average.h")
 target_link_libraries(AppGUI PRIVATE CoreLib Qt6::Widgets)
 if(WIN32)
     set_property(TARGET AppGUI PROPERTY VS_DEBUGGER_ENVIRONMENT "${DEBUG_ENV}")

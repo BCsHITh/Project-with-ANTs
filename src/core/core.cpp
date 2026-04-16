@@ -1,6 +1,7 @@
 ﻿#include <string>
 #include <iostream>
 #include <chrono>
+#include <algorithm> 
 #include "core.h"
 
 // 获取用户输入的路径
@@ -824,4 +825,132 @@ int runBatchRegistration() {
     std::cin.get();
 
     return (failCount == 0) ? 0 : 1;
+}
+
+// ⭐ 新增：图像平均化功能
+// ⭐ 修改后的：图像平均化功能
+int runImageAverage() {
+    std::cout << "=== 图像平均化处理 ===" << std::endl;
+    std::cout << "通过迭代配准和平均生成高质量模板" << std::endl;
+    std::cout << std::endl;
+
+    AverageConfig config;
+
+    // 1. 输入目录
+    std::cout << "请输入包含 NIfTI 文件的文件夹: ";
+    std::string input;
+    std::getline(std::cin, input);
+
+    if (input.front() == '"' && input.back() == '"') {
+        input = input.substr(1, input.size() - 2);
+    }
+    config.inputFolder = input;
+
+    if (!fs::exists(config.inputFolder)) {
+        std::cerr << "错误：输入目录不存在：" << config.inputFolder << std::endl;
+        return 1;
+    }
+
+    // 2. 输出目录
+    std::cout << "请输入输出目录 (留空则在输入目录下创建 average 子目录): ";
+    std::getline(std::cin, input);
+
+    if (input.empty()) {
+        config.outputFolder = config.inputFolder + "/average";
+    }
+    else {
+        if (input.front() == '"' && input.back() == '"') {
+            input = input.substr(1, input.size() - 2);
+        }
+        config.outputFolder = input;
+    }
+
+    // 3. 输出前缀
+    std::cout << "请输入输出文件前缀 (默认 average): ";
+    std::getline(std::cin, config.outputPrefix);
+
+    if (config.outputPrefix.empty()) {
+        config.outputPrefix = "average";
+    }
+
+    // ⭐ 4. 是否进行配准
+    std::cout << std::endl;
+    std::cout << "图像是否已经配准？" << std::endl;
+    std::cout << "  y - 是，已配准（直接平均，跳过配准步骤）" << std::endl;
+    std::cout << "  n - 否，未配准（先配准再平均）" << std::endl;
+    std::cout << "请选择 (y/n，默认 n): ";
+    std::string regInput;
+    std::getline(std::cin, regInput);
+
+    // 如果选择"是，已配准"，则禁用配准
+    config.enableRegistration = (regInput.empty() ||
+        regInput[0] == 'n' || regInput[0] == 'N') ? true : false;
+
+    // 5. 是否去噪
+    std::cout << std::endl;
+    std::cout << "是否对最终平均图像去噪？(y/n，默认 n): ";
+    std::string dnInput;
+    std::getline(std::cin, dnInput);
+    config.enableDenoise = (!dnInput.empty() &&
+        (dnInput[0] == 'y' || dnInput[0] == 'Y'));
+
+    // 6. 迭代次数（仅当启用配准时）
+    if (config.enableRegistration) {
+        std::cout << "请输入迭代次数 (1-3，默认 2): ";
+        std::string iterInput;
+        std::getline(std::cin, iterInput);
+
+        if (!iterInput.empty()) {
+            try {
+                int iters = std::stoi(iterInput);
+                config.maxIterations = (std::max)(1, (std::min)(3, iters));
+            }
+            catch (...) {
+                config.maxIterations = 2;
+            }
+        }
+    }
+    else {
+        config.maxIterations = 1;  // 不配准时只需一轮平均
+    }
+
+    // 7. 确认配置
+    std::cout << std::endl;
+    std::cout << "=== 配置 ===" << std::endl;
+    std::cout << "输入目录：" << config.inputFolder << std::endl;
+    std::cout << "输出目录：" << config.outputFolder << std::endl;
+    std::cout << "输出前缀：" << config.outputPrefix << std::endl;
+    std::cout << "图像已配准：" << (config.enableRegistration ? "否（将先配准）" : "是（直接平均）") << std::endl;
+    if (config.enableRegistration) {
+        std::cout << "迭代次数：" << config.maxIterations << std::endl;
+    }
+    std::cout << "去噪：" << (config.enableDenoise ? "是" : "否") << std::endl;
+    std::cout << std::endl;
+    std::cout << "按回车开始处理，或输入 q 退出...";
+    std::string confirm;
+    std::getline(std::cin, confirm);
+
+    if (confirm == "q" || confirm == "Q") {
+        std::cout << "已取消" << std::endl;
+        return 0;
+    }
+
+    // 8. 执行平均化
+    std::cout << std::endl;
+    ImageAverager averager;
+
+    bool success = averager.average(config);
+
+    std::cout << std::endl;
+    if (success) {
+        std::cout << "✅ 图像平均化成功！" << std::endl;
+    }
+    else {
+        std::cerr << "❌ 图像平均化失败：" << averager.getLastError() << std::endl;
+    }
+
+    std::cout << "\n按任意键退出...";
+    std::cin.get();
+
+    return success ? 0 : 1;
 }

@@ -19,6 +19,22 @@ void printUsage(const char* progName) {
 }
 
 
+void showMenu() {
+    std::cout << "\n";
+    std::cout << "========================================\n";
+    std::cout << "=== DICOM to NIfTI Converter (CLI)   ===\n";
+    std::cout << "=== Build Version: 0.0.6             ===\n";
+    std::cout << "========================================\n";
+    std::cout << "\n请选择功能：\n";
+    std::cout << "  1. DICOM 转 NIfTI（单个文件夹）\n";
+    std::cout << "  2. DICOM 转 NIfTI（批量转换）\n";
+    std::cout << "  3. 查看已转换的 NIfTI 文件\n";
+    std::cout << "  4. 图像配准（单张，自定义输出）\n";
+    std::cout << "  5. 图像配准（批量，多张配准到同一基准）\n";
+    std::cout << "  6. 图像平均化（迭代配准 + 平均）\n";
+    std::cout << "  0. 退出程序\n";
+    std::cout << "\n";
+}
 
 
 // 验证并获取文件夹路径
@@ -29,7 +45,7 @@ int main(int argc, char* argv[])
 {
     setupConsole();
 
-    std::cout << "=== DICOM to NIfTI Converter (CLI) ===" << std::endl;
+    /*std::cout << "=== DICOM to NIfTI Converter (CLI) ===" << std::endl;
     std::cout << "Build Version: 0.0.5" << std::endl;
     std::cout << "dcm2niix: " << DCM2NIIX_EXE << std::endl;
     std::cout << "ANTs: " << ANTS_BIN_PATH << std::endl;
@@ -41,9 +57,10 @@ int main(int argc, char* argv[])
     std::cout << "  3. 查看已转换的 NIfTI 文件" << std::endl;
     std::cout << "  4. 图像配准（刚性/仿射）" << std::endl;
     std::cout << "  5. 图像配准（批量，多张配准到同一基准）" << std::endl;
-    std::cout << std::endl;
+    std::cout << "  6. 图像平均化（迭代配准+平均）" << std::endl;
+    std::cout << std::endl;*/
 
-    int mode = 1;
+    /*int mode = 1;
     if (argc < 3) {
         std::cout << "请输入模式: ";
         std::string modeInput;
@@ -51,24 +68,65 @@ int main(int argc, char* argv[])
         if (!modeInput.empty()) {
             mode = std::stoi(modeInput);
         }
-    }
+    }*/
+    while (true) {
+        showMenu();
 
-    switch (mode)
-    {
-    case 1:
-        return runSingleConversion(argc, argv);
-    case 2:
-        return runBatchMode();
-    case 3:
-        return runNiftiManager();
-    case 4:
-        return runRegistration();
-    case 5:
-		return runBatchRegistration();
-    default:
-        std::cout << "无效选项" << std::endl;
-        return 1;
+        int mode = 0;
+
+        // 如果有命令行参数，直接使用（仅第一次有效）
+        if (argc >= 2) {
+            try {
+                mode = std::stoi(argv[1]);
+                // 使用过一次后清除参数，避免死循环
+                argc = 1;
+            }
+            catch (...) {
+                mode = 0;
+            }
+        }
+        else {
+            // 交互模式：等待用户输入
+            std::cout << "请输入功能编号 (0-6，默认 1): ";
+            std::string modeInput;
+            std::getline(std::cin, modeInput);
+
+            if (!modeInput.empty()) {
+                try {
+                    mode = std::stoi(modeInput);
+                }
+                catch (...) {
+                    mode = 0;
+                }
+            }
+        }
+        int result = 0;
+        switch (mode)
+        {
+            case 1:
+                result = runSingleConversion(argc, argv); break;
+            case 2:
+                result = runBatchMode(); break;
+            case 3:
+                result = runNiftiManager(); break;
+            case 4:
+                result = runRegistration(); break;
+            case 5:
+                result = runBatchRegistration(); break;
+            case 6:  // ⭐ 新增
+                result = runImageAverage(); break;
+            case 0:
+                return 0;
+            default:
+                std::cout << "无效选项" << std::endl;
+                continue;
+        }
+        std::cout << "\n----------------------------------------\n";
+        std::cout << "按回车键返回主菜单...";
+        std::cin.get(); 
+
     }
+    return 0;
 }
 
 
