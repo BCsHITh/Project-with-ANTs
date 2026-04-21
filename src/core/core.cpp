@@ -886,7 +886,55 @@ int runImageAverage() {
     config.enableRegistration = (regInput.empty() ||
         regInput[0] == 'n' || regInput[0] == 'N') ? true : false;
 
-    // 5. 是否去噪
+    std::cout << std::endl;
+    std::cout << "请选择配准变换应用的插值方式：" << std::endl;
+    std::cout << "  1. Linear（线性插值，推荐用于连续图像）" << std::endl;
+    std::cout << "  2. NearestNeighbor（最近邻，适用于标签/分割图像）" << std::endl;
+    std::cout << "  3. BSpline（B样条，平滑插值）" << std::endl;
+    std::cout << "  4. Gaussian（高斯插值）" << std::endl;
+    std::cout << "  5. MultiLabel（多标签插值）" << std::endl;
+    std::cout << "  6. LanczosWindowedSinc（Lanczos，高质量但较慢）" << std::endl;
+    std::cout << std::endl;
+    std::cout << "请输入选项 (1-6，默认 1): ";
+    std::string interpInput;
+    std::getline(std::cin, interpInput);
+
+    if (!interpInput.empty()) {
+        try {
+            int interpChoice = std::stoi(interpInput);
+            switch (interpChoice) {
+            case 1:
+                config.interpolation = InterpolationType::Linear;
+                break;
+            case 2:
+                config.interpolation = InterpolationType::NearestNeighbor;
+                break;
+            case 3:
+                config.interpolation = InterpolationType::BSpline;
+                break;
+            case 4:
+                config.interpolation = InterpolationType::Gaussian;
+                break;
+            case 5:
+                config.interpolation = InterpolationType::MultiLabel;
+                break;
+            case 6:
+                config.interpolation = InterpolationType::LanczosWindowedSinc;
+                break;
+            default:
+                config.interpolation = InterpolationType::Linear;
+                std::cout << "  无效选项，使用默认：Linear" << std::endl;
+            }
+        }
+        catch (...) {
+            config.interpolation = InterpolationType::Linear;
+        }
+    }
+    else {
+        config.interpolation = InterpolationType::Linear;
+    }
+
+    // 6. 是否去噪
     std::cout << std::endl;
     std::cout << "是否对最终平均图像去噪？(y/n，默认 n): ";
     std::string dnInput;
@@ -914,13 +962,14 @@ int runImageAverage() {
         config.maxIterations = 1;  // 不配准时只需一轮平均
     }
 
-    // 7. 确认配置
+    // 8. 确认配置
     std::cout << std::endl;
     std::cout << "=== 配置 ===" << std::endl;
     std::cout << "输入目录：" << config.inputFolder << std::endl;
     std::cout << "输出目录：" << config.outputFolder << std::endl;
     std::cout << "输出前缀：" << config.outputPrefix << std::endl;
     std::cout << "图像已配准：" << (config.enableRegistration ? "否（将先配准）" : "是（直接平均）") << std::endl;
+    std::cout << "插值方式：" << interpolationToString(config.interpolation) << std::endl;  // ⭐ 显示插值方式
     if (config.enableRegistration) {
         std::cout << "迭代次数：" << config.maxIterations << std::endl;
     }
@@ -935,7 +984,7 @@ int runImageAverage() {
         return 0;
     }
 
-    // 8. 执行平均化
+    // 9. 执行平均化
     std::cout << std::endl;
     ImageAverager averager;
 

@@ -93,12 +93,14 @@ bool ImageAverager::averageImages(const std::vector<std::string>& inputImages,
 bool ImageAverager::applyTransform(const std::string& reference,
     const std::string& moving,
     const std::string& transformFile,
-    const std::string& outputFile) {
+    const std::string& outputFile,
+    InterpolationType interpType) {
     std::string antsPath = ANTS_BIN_PATH;
     if (antsPath.empty()) {
         lastError = "ANTs 路径未配置";
         return false;
     }
+    std::string interpStr = interpolationToString(interpType);
 
     std::string cmd = "\"" + antsPath + "\\antsApplyTransforms.exe\" "
         "--dimensionality 3 "
@@ -106,7 +108,7 @@ bool ImageAverager::applyTransform(const std::string& reference,
         "--reference " + reference + " "
         "--transform " + transformFile + " "
         "--output " + outputFile + " "
-        "--interpolation Linear";
+        "--interpolation " + interpStr;
 
     return executeCommand(cmd).empty();
 }

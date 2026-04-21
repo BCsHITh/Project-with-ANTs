@@ -1,36 +1,71 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <vector>
 #include <filesystem>
 
 namespace fs = std::filesystem;
 
-// Í¼ÏñÆ½¾ùÅäÖÃ
+
+
+// â­ æ’å€¼æ–¹å¼æšä¸¾
+enum class InterpolationType {
+    Linear,           // çº¿æ€§æ’å€¼ï¼ˆé»˜è®¤ï¼‰
+    NearestNeighbor,  // æœ€è¿‘é‚»æ’å€¼
+    MultiLabel,       // å¤šæ ‡ç­¾æ’å€¼
+    Gaussian,         // é«˜æ–¯æ’å€¼
+    BSpline,          // Bæ ·æ¡æ’å€¼
+    LanczosWindowedSinc  // Lanczos çª—å£ sinc æ’å€¼
+};
+
+// è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+inline std::string interpolationToString(InterpolationType type) {
+    switch (type) {
+    case InterpolationType::Linear:
+        return "Linear";
+    case InterpolationType::NearestNeighbor:
+        return "NearestNeighbor";
+    case InterpolationType::MultiLabel:
+        return "MultiLabel";
+    case InterpolationType::Gaussian:
+        return "Gaussian";
+    case InterpolationType::BSpline:
+        return "BSpline";
+    case InterpolationType::LanczosWindowedSinc:
+        return "LanczosWindowedSinc";
+    default:
+        return "Linear";
+    }
+}
+
+
+// å›¾åƒå¹³å‡é…ç½®
 struct AverageConfig {
-    std::string inputFolder;           // ÊäÈëÎÄ¼ş¼Ğ
-    std::string outputFolder;          // Êä³öÎÄ¼ş¼Ğ
-    std::string outputPrefix;          // Êä³öÇ°×º
-    bool enableDenoise;                // ÊÇ·ñÈ¥Ôë
-    bool enableRegistration;           // ÊÇ·ñÅä×¼
-    std::string regType1;              // µÚÒ»ÂÖÅä×¼ÀàĞÍ
-    std::string regType2;              // µÚ¶şÂÖÅä×¼ÀàĞÍ
-    int maxIterations;                 // ×î´óµü´ú´ÎÊı
+    std::string inputFolder;           // è¾“å…¥æ–‡ä»¶å¤¹
+    std::string outputFolder;          // è¾“å‡ºæ–‡ä»¶å¤¹
+    std::string outputPrefix;          // è¾“å‡ºå‰ç¼€
+    bool enableDenoise;                // æ˜¯å¦å»å™ª
+    bool enableRegistration;           // æ˜¯å¦é…å‡†
+    InterpolationType interpolation;   // â­ æ’å€¼æ–¹å¼ï¼ˆæ–°å¢ï¼‰
+    std::string regType1;              // ç¬¬ä¸€è½®é…å‡†ç±»å‹
+    std::string regType2;              // ç¬¬äºŒè½®é…å‡†ç±»å‹
+    int maxIterations;                 // æœ€å¤§è¿­ä»£æ¬¡æ•°
 
     AverageConfig()
         : enableDenoise(false)
         , enableRegistration(true)
+        , interpolation(InterpolationType::Linear)
         , regType1("Rigid")
         , regType2("Similarity")
         , maxIterations(2) {
     }
 };
 
-// Í¼ÏñÆ½¾ù´¦ÀíÆ÷
+// å›¾åƒå¹³å‡å¤„ç†å™¨
 class ImageAverager {
 public:
     ImageAverager();
 
-    // Ö´ĞĞÍ¼ÏñÆ½¾ù
+    // æ‰§è¡Œå›¾åƒå¹³å‡
     bool average(const AverageConfig& config);
 
     std::string getLastError() const { return lastError; }
@@ -38,7 +73,7 @@ public:
 private:
     std::string lastError;
 
-    // ¸¨Öúº¯Êı
+    // è¾…åŠ©å‡½æ•°
     std::vector<std::string> findNiftiFiles(const fs::path& folder);
     bool registerToReference(const std::string& fixed,
         const std::string& moving,
@@ -49,7 +84,8 @@ private:
     bool applyTransform(const std::string& reference,
         const std::string& moving,
         const std::string& transformFile,
-        const std::string& outputFile);
+        const std::string& outputFile,
+        InterpolationType interpType);
     bool denoiseImage(const std::string& input,
         const std::string& output);
     std::string executeCommand(const std::string& cmd);
