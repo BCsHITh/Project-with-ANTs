@@ -223,9 +223,8 @@ bool TemplateNormalizer::registerT1ToTemplate(const std::string& t1w,
         return false;
     }
 
-    // 生成的变换文件
     affineTransform = outputPrefix + "0GenericAffine.mat";
-    warpTransform = outputPrefix + "1InverseWarp.nii.gz";
+    warpTransform = outputPrefix + "1Warp.nii.gz";  // ⭐ 使用 1Warp 而不是 1InverseWarp
 
     // 验证变换文件是否生成
     if (!fs::exists(affineTransform)) {
@@ -279,28 +278,86 @@ bool TemplateNormalizer::applyTransformToBold(const std::string& boldImage,
         return false;
     }
 
-    // 构建应用变换命令
-    // 注意：需要先从 BOLD 空间到 T1w 空间，再从 T1w 到模板空间
+    //// 构建应用变换命令
+    //// 注意：需要先从 BOLD 空间到 T1w 空间，再从 T1w 到模板空间
+    //std::string cmd = "\"" + antsPath + "\\antsApplyTransforms.exe\" "
+    //    "--dimensionality 4 "  // BOLD 通常是 4D
+    //    "--input \"" + boldImage + "\" "
+    //    "--reference \"" + templateImage + "\" "
+    //    "--transform \"" + warpTransform + "\" "
+    //    "--transform \"" + affineTransform + "\" "
+    //    "--output \"" + outputFile + "\" "
+    //    "--interpolation Linear "
+    //    "--verbose 1";
+    // ⭐ 修复：构建应用变换命令
+    // 注意：变换应用顺序是从右到左（先仿射，后非线性）
+    // BOLD 已经和 T1w 对齐了（通过之前的配准），所以只需要应用 T1w→模板的变换
     std::string cmd = "\"" + antsPath + "\\antsApplyTransforms.exe\" "
         "--dimensionality 4 "  // BOLD 通常是 4D
         "--input \"" + boldImage + "\" "
         "--reference \"" + templateImage + "\" "
-        "--transform \"" + warpTransform + "\" "
-        "--transform \"" + affineTransform + "\" "
+        "--transform \"" + warpTransform + "\" "  // ⭐ 先应用非线性形变
+        "--transform \"" + affineTransform + "\" "  // ⭐ 再应用仿射
         "--output \"" + outputFile + "\" "
         "--interpolation Linear "
-        "--verbose 1";
+        "--verbose 0";  // 关闭详细输出以减少日志
+
 
     std::cout << "  BOLD: " << fs::path(boldImage).filename().string() << std::endl;
     std::cout << "  输出：" << fs::path(outputFile).filename().string() << std::endl;
 
-    if (!executeCommand(cmd).empty()) {
+    /*if (!executeCommand(cmd).empty()) {
+        return false;
+    }*/
+    // 使用 CreateProcess 执行
+    STARTUPINFOA si = {};
+    si.cb = sizeof(si);
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_HIDE;
+
+    PROCESS_INFORMATION pi = {};
+
+    std::vector<char> cmdBuffer(cmd.begin(), cmd.end());
+    cmdBuffer.push_back('\0');
+
+    BOOL success = CreateProcessA(
+        NULL,
+        cmdBuffer.data(),
+        NULL,
+        NULL,
+        FALSE,
+        CREATE_NO_WINDOW,
+        NULL,
+        NULL,
+        &si,
+        &pi
+    );
+
+    if (!success) {
+        lastError = "无法启动 antsApplyTransforms (Error: " + std::to_string(GetLastError()) + ")";
+        std::cerr << "  错误：" << lastError << std::endl;
+        return false;
+    }
+
+    // 等待完成
+    WaitForSingleObject(pi.hProcess, INFINITE);
+
+    DWORD exitCode;
+    GetExitCodeProcess(pi.hProcess, &exitCode);
+
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    if (exitCode != 0) {
+        lastError = "应用变换失败 (退出码：" + std::to_string(exitCode) + ")";
+        std::cerr << "  错误：" << lastError << std::endl;
         return false;
     }
 
     // 验证输出
     if (!fs::exists(outputFile)) {
         lastError = "标准化后的 BOLD 文件未生成：" + outputFile;
+        std::cerr << "  错误：" << lastError << std::endl;
         return false;
     }
 
