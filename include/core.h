@@ -5,6 +5,8 @@
 #include "nifti_manager.h"
 #include "dicom_converter.h"
 #include "image_average.h"
+#include "normalize_to_template.h"  // ? 新增
+
 
 namespace fs = std::filesystem;
 
@@ -23,5 +25,7 @@ int runRegistration();
 int runBatchRegistration();
 
 int runImageAverage();
+
+int runNormalizeToTemplate();  // ? 新增
 
 #endif // !_CORE_H_

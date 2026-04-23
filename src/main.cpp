@@ -23,7 +23,7 @@ void showMenu() {
     std::cout << "\n";
     std::cout << "========================================\n";
     std::cout << "=== DICOM to NIfTI Converter (CLI)   ===\n";
-    std::cout << "=== Build Version: 0.0.6             ===\n";
+    std::cout << "=== Build Version: 0.0.7             ===\n";
     std::cout << "========================================\n";
     std::cout << "\n请选择功能：\n";
     std::cout << "  1. DICOM 转 NIfTI（单个文件夹）\n";
@@ -32,6 +32,7 @@ void showMenu() {
     std::cout << "  4. 图像配准（单张，自定义输出）\n";
     std::cout << "  5. 图像配准（批量，多张配准到同一基准）\n";
     std::cout << "  6. 图像平均化（迭代配准 + 平均）\n";
+    std::cout << "  7. 空间标准化到模板（T1w + BOLD）" << std::endl;  // ⭐ 新增
     std::cout << "  0. 退出程序\n";
     std::cout << "\n";
 }
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
         }
         else {
             // 交互模式：等待用户输入
-            std::cout << "请输入功能编号 (0-6，默认 1): ";
+            std::cout << "请输入功能编号 (0-7，默认 1): ";
             std::string modeInput;
             std::getline(std::cin, modeInput);
 
@@ -115,6 +116,8 @@ int main(int argc, char* argv[])
                 result = runBatchRegistration(); break;
             case 6:  // ⭐ 新增
                 result = runImageAverage(); break;
+            case 7:  // ⭐ 新增
+                result = runNormalizeToTemplate(); break;
             case 0:
                 return 0;
             default:

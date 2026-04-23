@@ -1003,3 +1003,114 @@ int runImageAverage() {
 
     return success ? 0 : 1;
 }
+
+// ⭐ 新增：空间标准化到模板
+int runNormalizeToTemplate() {
+    std::cout << "=== 空间标准化到模板空间 ===" << std::endl;
+    std::cout << "将 T1w 和 BOLD 配准到标准模板（如 MNI152）" << std::endl;
+    std::cout << std::endl;
+
+    NormalizeConfig config;
+
+    // 1. 输入平均 T1w 图像
+    std::cout << "请输入平均 T1w 图像路径: ";
+    std::string input;
+    std::getline(std::cin, input);
+
+    if (input.front() == '"' && input.back() == '"') {
+        input = input.substr(1, input.size() - 2);
+    }
+    config.t1wImage = input;
+
+    if (!fs::exists(config.t1wImage)) {
+        std::cerr << "错误：T1w 图像不存在：" << config.t1wImage << std::endl;
+        return 1;
+    }
+
+    // 2. 输入标准模板
+    std::cout << "请输入标准模板图像路径 (如 MNI152): ";
+    std::getline(std::cin, input);
+
+    if (input.front() == '"' && input.back() == '"') {
+        input = input.substr(1, input.size() - 2);
+    }
+    config.templateImage = input;
+
+    if (!fs::exists(config.templateImage)) {
+        std::cerr << "错误：模板图像不存在：" << config.templateImage << std::endl;
+        return 1;
+    }
+
+    // 3. 输入 BOLD 文件夹
+    std::cout << "请输入 BOLD 序列文件夹路径: ";
+    std::getline(std::cin, input);
+
+    if (input.front() == '"' && input.back() == '"') {
+        input = input.substr(1, input.size() - 2);
+    }
+    config.boldFolder = input;
+
+    if (!fs::exists(config.boldFolder)) {
+        std::cerr << "错误：BOLD 文件夹不存在：" << config.boldFolder << std::endl;
+        return 1;
+    }
+
+    // 4. 输出目录
+    std::cout << "请输入输出目录: ";
+    std::getline(std::cin, input);
+
+    if (input.front() == '"' && input.back() == '"') {
+        input = input.substr(1, input.size() - 2);
+    }
+    config.outputFolder = input;
+
+    // 5. 输出前缀
+    std::cout << "请输入输出文件前缀 (默认 normalized): ";
+    std::getline(std::cin, config.outputPrefix);
+
+    if (config.outputPrefix.empty()) {
+        config.outputPrefix = "normalized";
+    }
+
+    // 6. 确认配置
+    std::cout << std::endl;
+    std::cout << "=== 配置 ===" << std::endl;
+    std::cout << "T1w 图像：" << config.t1wImage << std::endl;
+    std::cout << "标准模板：" << config.templateImage << std::endl;
+    std::cout << "BOLD 文件夹：" << config.boldFolder << std::endl;
+    std::cout << "输出目录：" << config.outputFolder << std::endl;
+    std::cout << "输出前缀：" << config.outputPrefix << std::endl;
+    std::cout << "配准方法：SyN 非线性配准" << std::endl;
+    std::cout << std::endl;
+    std::cout << "按回车开始处理，或输入 q 退出...";
+    std::string confirm;
+    std::getline(std::cin, confirm);
+
+    if (confirm == "q" || confirm == "Q") {
+        std::cout << "已取消" << std::endl;
+        return 0;
+    }
+
+    // 7. 执行标准化
+    std::cout << std::endl;
+    TemplateNormalizer normalizer;
+
+    bool success = normalizer.normalize(config);
+
+    std::cout << std::endl;
+    if (success) {
+        std::cout << "✅ 空间标准化成功！" << std::endl;
+        std::cout << "\n输出文件说明：" << std::endl;
+        std::cout << "  - " << config.outputPrefix << "*_MNI.nii.gz : 标准化后的 BOLD" << std::endl;
+        std::cout << "  - " << config.outputPrefix << "0GenericAffine.mat : 仿射矩阵" << std::endl;
+        std::cout << "  - " << config.outputPrefix << "1Warp.nii.gz : 形变场" << std::endl;
+    }
+    else {
+        std::cerr << "❌ 空间标准化失败：" << normalizer.getLastError() << std::endl;
+    }
+
+    std::cout << "\n按任意键退出...";
+    std::cin.get();
+
+    return success ? 0 : 1;
+}
